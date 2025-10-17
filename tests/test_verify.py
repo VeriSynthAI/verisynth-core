@@ -8,7 +8,8 @@ from pathlib import Path
 from verisynth.verify import (
     file_sha256,
     row_hash,
-    merkle_root
+    merkle_root,
+    verify_proof
 )
 
 
@@ -249,3 +250,79 @@ class TestVerifyIntegration:
         # Verify that verification fails
         assert file_sha256(proof["input"]["path"]) != proof["input"]["file_sha256"]
         assert file_sha256(proof["output"]["path"]) == proof["output"]["file_sha256"]
+
+
+class TestVerifyProof:
+    """Test verify_proof function."""
+    
+    def test_verify_proof_success(self, tmp_path):
+        """Test successful proof verification."""
+        # Create test data
+        input_file = tmp_path / "input.csv"
+        output_file = tmp_path / "output.csv"
+        
+        input_df = pd.DataFrame({'age': [30, 40, 50]})
+        output_df = pd.DataFrame({'age': [32, 42, 52]})
+        
+        input_df.to_csv(input_file, index=False)
+        output_df.to_csv(output_file, index=False)
+        
+        # Create proof
+        proof = {
+            "input": {
+                "path": str(input_file),
+                "file_sha256": file_sha256(str(input_file)),
+                "merkle_root": merkle_root(input_df)
+            },
+            "output": {
+                "path": str(output_file),
+                "file_sha256": file_sha256(str(output_file)),
+                "merkle_root": merkle_root(output_df)
+            }
+        }
+        
+        proof_file = tmp_path / "proof.json"
+        with open(proof_file, 'w') as f:
+            json.dump(proof, f)
+        
+        # Verify proof
+        verify_proof(str(proof_file))
+    
+    def test_verify_proof_failure(self, tmp_path):
+        """Test proof verification failure."""
+        # Create test data
+        input_file = tmp_path / "input.csv"
+        output_file = tmp_path / "output.csv"
+        
+        input_df = pd.DataFrame({'age': [30, 40, 50]})
+        output_df = pd.DataFrame({'age': [32, 42, 52]})
+        
+        input_df.to_csv(input_file, index=False)
+        output_df.to_csv(output_file, index=False)
+        
+        # Create proof with wrong hash
+        proof = {
+            "input": {
+                "path": str(input_file),
+                "file_sha256": "wrong_hash",
+                "merkle_root": merkle_root(input_df)
+            },
+            "output": {
+                "path": str(output_file),
+                "file_sha256": file_sha256(str(output_file)),
+                "merkle_root": merkle_root(output_df)
+            }
+        }
+        
+        proof_file = tmp_path / "proof.json"
+        with open(proof_file, 'w') as f:
+            json.dump(proof, f)
+        
+        # Verify that verification fails
+        with pytest.raises(AssertionError):
+            verify_proof(str(proof_file))
+    
+    def test_verify_proof_nonexistent_file(self):
+        """Test proof verification with nonexistent file."""
+        with pytest.raises(FileNotFoundError):
+            verify_proof("nonexistent_proof.json")

@@ -24,12 +24,17 @@ def merkle_root(df):
         level = nxt
     return level[0].hex()
 
-proof = json.load(open("out/proof.json"))
-assert file_sha256(proof["input"]["path"])  == proof["input"]["file_sha256"]
-assert file_sha256(proof["output"]["path"]) == proof["output"]["file_sha256"]
+def verify_proof(proof_path="out/proof.json"):
+    """Verify a proof file by checking hashes and Merkle roots."""
+    proof = json.load(open(proof_path))
+    assert file_sha256(proof["input"]["path"])  == proof["input"]["file_sha256"]
+    assert file_sha256(proof["output"]["path"]) == proof["output"]["file_sha256"]
 
-rin = pd.read_csv(proof["input"]["path"])
-rout = pd.read_csv(proof["output"]["path"])
-assert merkle_root(rin)  == proof["input"]["merkle_root"]
-assert merkle_root(rout) == proof["output"]["merkle_root"]
-print("OK: hashes and Merkle roots verified.")
+    rin = pd.read_csv(proof["input"]["path"])
+    rout = pd.read_csv(proof["output"]["path"])
+    assert merkle_root(rin)  == proof["input"]["merkle_root"]
+    assert merkle_root(rout) == proof["output"]["merkle_root"]
+    print("OK: hashes and Merkle roots verified.")
+
+if __name__ == "__main__":
+    verify_proof()
