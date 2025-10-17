@@ -2,7 +2,7 @@
 
 # VeriSynth Core
 
-[![Tests](https://github.com/VeriSynthAI/verisynth-core/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/VeriSynthAI/verisynth-core/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [![Tests](https://github.com/VeriSynthAI/verisynth-core/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/VeriSynthAI/verisynth-core/actions/workflows/test.yml) [![PyPI](https://img.shields.io/pypi/v/verisynth-core.svg)](https://pypi.org/project/verisynth-core/)
 
 
 **VeriSynth Core** is a lightweight, privacy-preserving **synthetic data generation CLI**.
