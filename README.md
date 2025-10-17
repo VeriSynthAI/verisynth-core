@@ -2,6 +2,9 @@
 
 # VeriSynth Core
 
+[![Tests](https://github.com/owner/repo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/owner/repo/actions/workflows/test.yml)
+
+
 **VeriSynth Core** is a lightweight, privacy-preserving **synthetic data generation CLI**.
 It transforms sensitive tabular datasets into statistically realistic synthetic data — with **cryptographic proof receipts** that verify integrity and reproducibility.
 
@@ -59,6 +62,60 @@ python -m verisynth.cli --create-schema-example config.yaml
 # Run with schema (excludes patient_id, maps types)
 python -m verisynth.cli --input data/sample_patients.csv --output out/ --schema config.yaml
 ```
+
+---
+
+## 🧪 Running Tests
+
+VeriSynth includes a comprehensive test suite to ensure reliability and correctness.
+
+### Prerequisites
+
+Make sure you have the development dependencies installed:
+
+```bash
+pip install pytest pytest-cov
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+python -m pytest tests/ -v
+
+# Run tests with coverage report
+python -m pytest tests/ --cov=verisynth --cov-report=term-missing
+
+# Run a specific test file
+python -m pytest tests/test_cli.py -v
+
+# Run tests in verbose mode with coverage
+python -m pytest tests/ -v --cov=verisynth --cov-report=term-missing
+```
+
+### Test Structure
+
+The test suite includes:
+
+- **`test_cli.py`** - Tests the command-line interface functionality
+- **`test_proof.py`** - Tests Merkle root consistency and proof generation
+- **`test_synth.py`** - Tests synthetic data generation and shape validation
+- **`test_schema.py`** - Tests schema configuration functionality (25 comprehensive test cases)
+
+#### Schema Test Coverage
+
+The `test_schema.py` file provides comprehensive testing for the schema feature:
+
+- **Configuration Tests**: YAML file loading, validation, error handling
+- **Field Operations**: Exclusion, type conversion (int, float, bool, str)
+- **CLI Integration**: Schema file creation, command-line usage
+- **Synthesis Integration**: Schema application during data generation
+- **Edge Cases**: Empty dataframes, invalid configurations, missing fields
+- **Backward Compatibility**: Ensures existing functionality still works
+
+### Continuous Integration
+
+Tests are automatically run on every push and pull request via GitHub Actions, ensuring code quality and preventing regressions.
 
 ---
 

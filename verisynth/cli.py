@@ -1,5 +1,5 @@
 \
-import argparse, os, json, time, random, platform
+import argparse, os, json, time, random, platform, sys
 import pandas as pd
 import numpy as np
 
@@ -38,7 +38,7 @@ def main():
             print(f"Loaded schema configuration from: {args.schema}")
         except Exception as e:
             print(f"Error loading schema configuration: {e}")
-            return
+            sys.exit(1)
 
     # Load
     df = pd.read_csv(args.input)

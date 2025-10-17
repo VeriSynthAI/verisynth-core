@@ -98,6 +98,11 @@ class SchemaConfig:
                 elif target_type.lower() == 'float':
                     result_df[field] = pd.to_numeric(result_df[field], errors='coerce').astype('float64')
                 elif target_type.lower() == 'bool':
+                    # Handle string boolean conversion
+                    if result_df[field].dtype == 'object':
+                        # Convert string booleans to actual booleans
+                        bool_map = {'True': True, 'False': False, 'true': True, 'false': False, '1': True, '0': False}
+                        result_df[field] = result_df[field].map(bool_map)
                     result_df[field] = result_df[field].astype('boolean')
                 elif target_type.lower() == 'str' or target_type.lower() == 'string':
                     result_df[field] = result_df[field].astype('string')
