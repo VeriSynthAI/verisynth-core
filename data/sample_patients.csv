@@ -1,0 +1,11 @@
+patient_id,age,sex,bmi,smoker,hba1c,cholesterol,systolic_bp,diastolic_bp,diagnosis
+1001,63,F,28.4,1,8.1,220,142,90,diabetes
+1002,45,M,26.1,0,5.6,185,130,82,healthy
+1003,52,F,31.3,1,7.8,240,150,95,diabetes
+1004,34,M,24.0,0,5.3,170,118,76,healthy
+1005,70,F,29.7,0,6.9,210,138,88,prediabetes
+1006,59,M,27.2,1,7.2,230,146,92,diabetes
+1007,41,F,25.1,0,5.4,190,124,80,healthy
+1008,66,M,30.5,1,8.4,250,152,96,diabetes
+1009,38,F,23.9,0,5.1,165,116,74,healthy
+1010,55,M,28.9,1,7.0,215,140,86,prediabetes
