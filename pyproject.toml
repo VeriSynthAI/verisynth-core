@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verisynth-core"
+version = "0.1.0"
+description = "Open-source synthetic data generator with cryptographic proof receipts."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name="VeriSynth.ai", email="info@verisynth.ai" }]
+keywords = ["synthetic-data", "privacy", "gaussian-copula", "ml", "verifiable"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+dependencies = [
+  "pandas>=2.0",
+  "numpy>=1.24",
+  "sdv>=1.12.0",
+  "scipy>=1.10",
+]
+
+[project.scripts]
+verisynth = "verisynth.cli:main"   # exposes `verisynth` CLI
+
+[tool.setuptools.packages.find]
+include = ["verisynth*"]
+exclude = ["tests*", "out*", "data*", "artifacts*"]
+
+[project.urls]
+Homepage = "https://verisynth.ai"
+Repository = "https://github.com/VeriSynthAI/verisynth-core"
+Issues = "https://github.com/VeriSynthAI/verisynth-core/issues"

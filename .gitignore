@@ -4,6 +4,7 @@ out/
 __pycache__/
 *.egg-info/
 *.egg
+dist/
 *.pyo
 *.pyd
 *.pyw
