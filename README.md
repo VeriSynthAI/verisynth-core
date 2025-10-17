@@ -1,4 +1,4 @@
-![logo](https://github.com/user-attachments/assets/7e845625-51e1-4839-ac5a-3a34c8115d4f)
+<img src="https://github.com/user-attachments/assets/7e845625-51e1-4839-ac5a-3a34c8115d4f" alt="VeriSynth Logo" width="280"/>
 
 # VeriSynth Core
 
