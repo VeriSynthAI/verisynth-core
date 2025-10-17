@@ -1,3 +1,5 @@
+![logo](https://github.com/user-attachments/assets/7e845625-51e1-4839-ac5a-3a34c8115d4f)
+
 # VeriSynth Core
 
 **VeriSynth Core** is a lightweight, privacy-preserving **synthetic data generation CLI**.
