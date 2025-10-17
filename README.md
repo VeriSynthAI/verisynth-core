@@ -11,6 +11,7 @@ It transforms sensitive tabular datasets into statistically realistic synthetic 
 
 * 🔐 **Privacy-safe synthesis** — no real records are ever exposed
 * 📊 **Statistical realism** using Gaussian Copula modeling
+* 🗂️ **Schema configuration** — explicit field mapping and exclusion via YAML
 * 🧾 **Proof receipts** (`proof.json`) include hashes, Merkle roots, metrics & seed
 * 🧠 **Deterministic generation** via reproducible random seeds
 * ⚡ **Runs locally** — no cloud or GPUs required
@@ -49,6 +50,16 @@ This command:
   * `out/synthetic.csv` → synthetic dataset
   * `out/proof.json` → verifiable proof receipt
 
+### 4. Optional: Use Schema Configuration
+
+```bash
+# Create example schema configuration
+python -m verisynth.cli --create-schema-example config.yaml
+
+# Run with schema (excludes patient_id, maps types)
+python -m verisynth.cli --input data/sample_patients.csv --output out/ --schema config.yaml
+```
+
 ---
 
 ## 🧾 Example Proof Receipt
@@ -78,25 +89,66 @@ python verisynth/verify.py
 ## ⚙️ CLI Reference
 
 ```bash
-verisynth synth --input <path> --output <dir> [--rows N] [--seed SEED]
+python -m verisynth.cli --input <path> --output <dir> [--rows N] [--seed SEED] [--schema SCHEMA]
 ```
 
 | Flag       | Description                                                   |
 | ---------- | ------------------------------------------------------------- |
 | `--input`  | Path to input CSV file                                        |
 | `--output` | Output directory for synthetic data and proof                 |
-| `--rows`   | Number of synthetic rows to generate (default: same as input) |
+| `--rows`   | Number of synthetic rows to generate (default: 1000)         |
 | `--seed`   | Random seed for deterministic reproducibility                 |
+| `--schema` | Path to YAML schema configuration file (optional)            |
 
-Example:
+Examples:
 
 ```bash
-verisynth synth data/finance.csv -o out/ --rows 500000 --seed 1337
+# Basic synthesis
+python -m verisynth.cli --input data/finance.csv --output out/ --rows 500000 --seed 1337
+
+# With schema configuration
+python -m verisynth.cli --input data/patients.csv --output out/ --schema config.yaml
+
+# Create example schema configuration
+python -m verisynth.cli --create-schema-example config.yaml
 ```
 
 ---
 
-## 🔬 What’s Under the Hood
+## 🗂️ Schema Configuration
+
+VeriSynth supports explicit field mapping and exclusion through YAML schema configuration files. This gives you fine-grained control over which fields to synthesize and how to handle data types.
+
+### Schema Configuration Format
+
+```yaml
+exclude: ["patient_id", "address"]
+types:
+  age: int
+  bmi: float
+  smoker: bool
+  hba1c: float
+model:
+  engine: GaussianCopula
+  seed: 42
+```
+
+### Configuration Options
+
+- **`exclude`**: List of field names to exclude from synthesis (e.g., IDs, addresses)
+- **`types`**: Explicit type mappings for fields (supports: `int`, `float`, `bool`, `str`)
+- **`model`**: Model configuration including engine and seed
+
+### Benefits
+
+- **Privacy**: Exclude sensitive identifiers and PII
+- **Control**: Explicit type handling instead of automatic detection
+- **Reproducibility**: Schema configuration is included in proof receipts
+- **Validation**: Built-in validation ensures configuration correctness
+
+---
+
+## 🔬 What's Under the Hood
 
 VeriSynth uses a **Gaussian Copula model** to learn the joint distribution of all numeric and categorical variables.
 Instead of randomizing data, it captures real-world correlations (e.g., *age ↔ blood pressure*) and samples new records consistent with the original dataset.

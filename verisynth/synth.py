@@ -2,7 +2,8 @@
 import pandas as pd
 import numpy as np
 import warnings
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
+from .schema import SchemaConfig
 
 # Suppress SDV deprecation warnings globally
 warnings.filterwarnings("ignore", category=FutureWarning, module="sdv")
@@ -16,11 +17,28 @@ def _try_import_sdv():
     except Exception as e:
         return None, None
 
-def fit_and_sample(df: pd.DataFrame, n_rows: int, seed: int = 42) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+def fit_and_sample(df: pd.DataFrame, n_rows: int, seed: int = 42, schema_config: Optional[SchemaConfig] = None) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """
     Tries SDV GaussianCopula first. If unavailable, falls back to per-column sampling.
+    
+    Args:
+        df: Input DataFrame
+        n_rows: Number of rows to generate
+        seed: Random seed
+        schema_config: Optional schema configuration for field mapping and exclusion
     """
     np.random.seed(seed)
+
+    # Apply schema configuration if provided
+    if schema_config:
+        # Validate schema configuration
+        validation_errors = schema_config.validate()
+        if validation_errors:
+            raise ValueError(f"Schema configuration validation failed: {'; '.join(validation_errors)}")
+        
+        # Apply schema to input DataFrame
+        df = schema_config.apply_to_dataframe(df)
+        print(f"Applied schema configuration: excluded {len(schema_config.exclude_fields)} fields, mapped {len(schema_config.field_types)} field types")
 
     GaussianCopulaSynthesizer, SingleTableMetadata = _try_import_sdv()
     meta = {}
@@ -44,6 +62,8 @@ def fit_and_sample(df: pd.DataFrame, n_rows: int, seed: int = 42) -> Tuple[pd.Da
         meta = {
             "engine": "sdv.GaussianCopulaSynthesizer",
             "detected_dtypes": df.dtypes.astype(str).to_dict(),
+            "schema_applied": schema_config is not None,
+            "schema_config": schema_config.to_dict() if schema_config else None,
         }
         return synthetic, meta
 
@@ -63,8 +83,22 @@ def fit_and_sample(df: pd.DataFrame, n_rows: int, seed: int = 42) -> Tuple[pd.Da
             else:
                 synthetic[col] = np.random.choice(vals, size=n_rows, replace=True)
 
-    meta = {"engine": "fallback.empirical_sampler", "detected_dtypes": df.dtypes.astype(str).to_dict()}
+    meta = {
+        "engine": "fallback.empirical_sampler", 
+        "detected_dtypes": df.dtypes.astype(str).to_dict(),
+        "schema_applied": schema_config is not None,
+        "schema_config": schema_config.to_dict() if schema_config else None,
+    }
     return synthetic, meta
 
-def generate_synthetic(df: pd.DataFrame, n_rows: int, seed: int = 42):
-    return fit_and_sample(df, n_rows=n_rows, seed=seed)
+def generate_synthetic(df: pd.DataFrame, n_rows: int, seed: int = 42, schema_config: Optional[SchemaConfig] = None):
+    """
+    Generate synthetic data with optional schema configuration.
+    
+    Args:
+        df: Input DataFrame
+        n_rows: Number of rows to generate
+        seed: Random seed
+        schema_config: Optional schema configuration for field mapping and exclusion
+    """
+    return fit_and_sample(df, n_rows=n_rows, seed=seed, schema_config=schema_config)

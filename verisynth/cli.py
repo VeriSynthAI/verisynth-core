@@ -6,16 +6,39 @@ import numpy as np
 from .synth import generate_synthetic
 from .privacy import summarize_privacy_fidelity
 from .lineage import dataframe_merkle, file_hash
+from .schema import SchemaConfig
 
 def main():
     ap = argparse.ArgumentParser(description="VeriSynth Micro — local synthetic generator with proof receipt")
-    ap.add_argument("--input", required=True, help="Path to input CSV")
-    ap.add_argument("--output", required=True, help="Output directory")
+    ap.add_argument("--input", help="Path to input CSV")
+    ap.add_argument("--output", help="Output directory")
     ap.add_argument("--rows", type=int, default=1000, help="Rows to generate")
     ap.add_argument("--seed", type=int, default=42, help="Random seed")
+    ap.add_argument("--schema", help="Path to YAML schema configuration file")
+    ap.add_argument("--create-schema-example", help="Create example schema configuration file at specified path")
     args = ap.parse_args()
 
+    # Handle schema example creation
+    if args.create_schema_example:
+        from .schema import create_example_config
+        create_example_config(args.create_schema_example)
+        return
+
+    # Validate required arguments for synthesis
+    if not args.input or not args.output:
+        ap.error("--input and --output are required for synthesis")
+
     os.makedirs(args.output, exist_ok=True)
+
+    # Load schema configuration if provided
+    schema_config = None
+    if args.schema:
+        try:
+            schema_config = SchemaConfig(config_path=args.schema)
+            print(f"Loaded schema configuration from: {args.schema}")
+        except Exception as e:
+            print(f"Error loading schema configuration: {e}")
+            return
 
     # Load
     df = pd.read_csv(args.input)
@@ -24,7 +47,7 @@ def main():
     random.seed(model_seed)
 
     # Synthesize
-    synth, meta = generate_synthetic(df, n_rows=args.rows, seed=model_seed)
+    synth, meta = generate_synthetic(df, n_rows=args.rows, seed=model_seed, schema_config=schema_config)
 
     # Metrics
     metrics = summarize_privacy_fidelity(df, synth)
@@ -59,6 +82,8 @@ def main():
             "engine": meta.get("engine", "unknown"),
             "seed": model_seed,
             "detected_dtypes": meta.get("detected_dtypes", {}),
+            "schema_applied": meta.get("schema_applied", False),
+            "schema_config": meta.get("schema_config"),
         },
         "metrics": metrics,
         "environment": {
@@ -77,6 +102,14 @@ def main():
     lines.append(f"Input file: {args.input}")
     lines.append(f"Output file: {synth_path}")
     lines.append(f"Engine: {proof['model']['engine']}  | Seed: {model_seed}")
+    if proof['model']['schema_applied']:
+        lines.append(f"Schema: Applied from {args.schema}")
+        schema_config = proof['model']['schema_config']
+        if schema_config:
+            if schema_config.get('exclude'):
+                lines.append(f"  Excluded fields: {', '.join(schema_config['exclude'])}")
+            if schema_config.get('types'):
+                lines.append(f"  Type mappings: {len(schema_config['types'])} fields")
     lines.append("")
     lines.append("Fidelity & Privacy Diagnostics:")
     lines.append(f"- Mean Abs Correlation Delta: {metrics['corr_mean_abs_delta']} (lower is better)")
