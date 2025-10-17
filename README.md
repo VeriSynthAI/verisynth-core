@@ -2,7 +2,7 @@
 
 # VeriSynth Core
 
-[![Tests](https://github.com/owner/repo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/owner/repo/actions/workflows/test.yml)
+[![Tests](https://github.com/VeriSynthAI/verisynth-core/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/VeriSynthAI/verisynth-core/actions/workflows/test.yml)
 
 
 **VeriSynth Core** is a lightweight, privacy-preserving **synthetic data generation CLI**.
