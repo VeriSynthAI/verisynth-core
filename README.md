@@ -24,23 +24,16 @@ It transforms sensitive tabular datasets into statistically realistic synthetic 
 
 ## 🧰 Quick Start
 
-### 1. Create a virtual environment
+### 1. Install VeriSynth Core
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+pip install verisynth-core
 ```
 
-### 2. Install dependencies
+### 2. Run VeriSynth
 
 ```bash
-pip install -r requirements.txt
-```
-
-### 3. Run VeriSynth
-
-```bash
-python -m verisynth.cli --input data/sample_patients.csv --output out/ --rows 1000
+verisynth --input data/sample_patients.csv --output out/ --rows 1000
 ```
 
 This command:
@@ -53,14 +46,14 @@ This command:
   * `out/synthetic.csv` → synthetic dataset
   * `out/proof.json` → verifiable proof receipt
 
-### 4. Optional: Use Schema Configuration
+### 3. Optional: Use Schema Configuration
 
 ```bash
 # Create example schema configuration
-python -m verisynth.cli --create-schema-example config.yaml
+verisynth --create-schema-example config.yaml
 
 # Run with schema (excludes patient_id, maps types)
-python -m verisynth.cli --input data/sample_patients.csv --output out/ --schema config.yaml
+verisynth --input data/sample_patients.csv --output out/ --schema config.yaml
 ```
 
 ---
@@ -137,8 +130,9 @@ Each proof ensures **integrity** and **reproducibility**:
 same input + same seed = identical output and Merkle proof.
 
 ## Verify Sample Proof
+
 ```bash
-python verisynth/verify.py
+python -m verisynth.verify
 ```
 
 ---
@@ -146,7 +140,7 @@ python verisynth/verify.py
 ## ⚙️ CLI Reference
 
 ```bash
-python -m verisynth.cli --input <path> --output <dir> [--rows N] [--seed SEED] [--schema SCHEMA]
+verisynth --input <path> --output <dir> [--rows N] [--seed SEED] [--schema SCHEMA]
 ```
 
 | Flag       | Description                                                   |
@@ -161,13 +155,13 @@ Examples:
 
 ```bash
 # Basic synthesis
-python -m verisynth.cli --input data/finance.csv --output out/ --rows 500000 --seed 1337
+verisynth --input data/finance.csv --output out/ --rows 500000 --seed 1337
 
 # With schema configuration
-python -m verisynth.cli --input data/patients.csv --output out/ --schema config.yaml
+verisynth --input data/patients.csv --output out/ --schema config.yaml
 
 # Create example schema configuration
-python -m verisynth.cli --create-schema-example config.yaml
+verisynth --create-schema-example config.yaml
 ```
 
 ---
